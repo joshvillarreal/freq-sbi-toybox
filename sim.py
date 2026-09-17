@@ -14,6 +14,10 @@ def oscillation_probability(sin2_2theta, delta_m2, L, E):
     """Two-flavor oscillation probability: P(νμ → νe)"""
     return sin2_2theta * np.sin(1.267 * delta_m2 * L / E) ** 2
 
+def app_probability(U, delta_m2, L, E):
+    """Two-flavor oscillation probability: P(νμ → νe)"""
+    return sin2_2theta * np.sin(1.267 * delta_m2 * L / E) ** 2
+
 
 def average_probability_over_L(sin2_2theta, delta_m2, E, num_samples=1000):
     """Average the probability over uniformly distributed baseline L in [600, 1000] m"""    
@@ -35,6 +39,18 @@ def simulate_counts(sin2_2theta, delta_m2, seed=None):
         total_counts.append(rng.poisson(total_expected))
         signal.append(expected_signal)
     return np.array(total_counts), np.array(signal)
+
+def simulate_expectation(sin2_2theta, delta_m2, seed=None):
+    """Simulate total expectation per energy bin"""
+    total_counts = []
+    for E in ENERGY_CENTERS:
+        P_avg = average_probability_over_L(sin2_2theta, delta_m2, E)
+        expected_signal = NORMALIZATION * P_avg
+        total_expected = BACKGROUND_PER_BIN + expected_signal
+        if total_expected < 0:
+            print(sin2_2theta, delta_m2, total_expected)
+        total_counts.append(total_expected)
+    return np.array(total_counts)
 
 
 def _build_title(sin2_2theta, delta_m2):
